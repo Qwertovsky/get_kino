@@ -71,7 +71,6 @@ while next:
         link = film.find('a', attrs={'class': 'link film-snippet__media-content'}).get('href')
         sql = """insert into kinopoisk (name, altname, image, kinorating, userrating, info, link)
                  values ("%s", "%s", "%s", %s, %s, "%s", "%s");""" % (name, altname, image, kinorating, userrating, info, link)
-        print sql
         c.execute(sql)
         next = True
 
