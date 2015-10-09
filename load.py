@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from BeautifulSoup import BeautifulSoup
 from requests import Session
+from random import randint
+from time import sleep
 import argparse
 import sqlite3
 
@@ -55,6 +57,8 @@ def get_page(num):
 while next:
     next = False
     initial = initial + 1
+    if initial > 1:
+        sleep(randint(3, 10))
     page = BeautifulSoup(get_page(initial))
     for film in page.body.findAll('div', attrs={'itemtype': 'http://schema.org/Movie'}):
         name = film.find('meta', attrs={'itemprop': 'name'}).get('content')
@@ -76,5 +80,8 @@ while next:
         sql = """insert into kinopoisk (name, altname, image, kinorating, userrating, info, link)
                  values ("%s", "%s", "%s", %s, %s, "%s", "%s");""" % (name, altname, image, kinorating, userrating, info, link)
         c.execute(sql)
+        # we need to have some rest. it's gonna be a long way :)
         next = True
-    conn.commit()
+
+conn.commit()
+c.execute("select count(id) from kinopoisk;")
