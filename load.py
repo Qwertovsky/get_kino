@@ -57,6 +57,7 @@ def get_page(num):
 while next:
     next = False
     initial = initial + 1
+    # we need to have some rest. it's gonna be a long way :)
     if initial > 1:
         sleep(randint(3, 10))
     page = BeautifulSoup(get_page(initial))
@@ -80,8 +81,7 @@ while next:
         sql = """insert into kinopoisk (name, altname, image, kinorating, userrating, info, link)
                  values ("%s", "%s", "%s", %s, %s, "%s", "%s");""" % (name, altname, image, kinorating, userrating, info, link)
         c.execute(sql)
-        # we need to have some rest. it's gonna be a long way :)
+        conn.commit()
         next = True
 
-conn.commit()
 c.execute("select count(id) from kinopoisk;")
