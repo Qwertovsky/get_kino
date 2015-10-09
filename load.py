@@ -81,7 +81,8 @@ while next:
         sql = """insert into kinopoisk (name, altname, image, kinorating, userrating, info, link)
                  values ("%s", "%s", "%s", %s, %s, "%s", "%s");""" % (name, altname, image, kinorating, userrating, info, link)
         c.execute(sql)
-        conn.commit()
         next = True
+    conn.commit()
+    print initial
 
 c.execute("select count(id) from kinopoisk;")
