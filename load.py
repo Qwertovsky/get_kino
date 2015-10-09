@@ -59,7 +59,11 @@ while next:
     for film in page.body.findAll('div', attrs={'itemtype': 'http://schema.org/Movie'}):
         name = film.find('meta', attrs={'itemprop': 'name'}).get('content')
         altname = film.find('meta', attrs={'itemprop': 'alternateName'}).get('content')
-        image = film.find('img', attrs={'class': 'image image_picture film-snippet__image i-bem'}).get('src')
+        # sometimes image is missing :)
+        try:
+            image = film.find('img', attrs={'class': 'image image_picture film-snippet__image i-bem'}).get('src')
+        except AttributeError:
+            image = ""
         # sometimes there is movies without rating. strange but we need to
         # process exception here
         try:
@@ -73,5 +77,4 @@ while next:
                  values ("%s", "%s", "%s", %s, %s, "%s", "%s");""" % (name, altname, image, kinorating, userrating, info, link)
         c.execute(sql)
         next = True
-
-conn.commit()
+    conn.commit()
