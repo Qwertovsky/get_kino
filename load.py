@@ -59,23 +59,32 @@ while next:
     initial = initial + 1
     # we need to have some rest. it's gonna be a long way :)
     if initial > 1:
-        sleep(randint(3, 10))
+        print initial
+        # need to increase timeout
+        # otherwise it aborts after 15-16 pages
+        sleep(randint(7, 20))
     page = BeautifulSoup(get_page(initial))
     for film in page.body.findAll('div', attrs={'itemtype': 'http://schema.org/Movie'}):
+        # well, somtimes some fields are missing
+        # that's why we need try contructions here
+        # though it's really strange
         name = film.find('meta', attrs={'itemprop': 'name'}).get('content')
-        altname = film.find('meta', attrs={'itemprop': 'alternateName'}).get('content')
-        # sometimes image is missing :)
+        try:
+            altname = film.find('meta', attrs={'itemprop': 'alternateName'}).get('content')
+        except AttributeError:
+            altname = name
         try:
             image = film.find('img', attrs={'class': 'image image_picture film-snippet__image i-bem'}).get('src')
         except AttributeError:
             image = ""
-        # sometimes there is movies without rating. strange but we need to
-        # process exception here
         try:
             kinorating = film.find('div', attrs={'itemprop': 'ratingValue'}).text
         except AttributeError:
             kinorating = 0
-        userrating = film.find('div', attrs={'class': 'film-snippet__user-rating-rate'}).text
+        try:
+            userrating = film.find('div', attrs={'class': 'film-snippet__user-rating-rate'}).text
+        except AttributeError:
+            userrating = 0
         info = film.find('div', attrs={'class': 'film-snippet__info'}).text
         link = film.find('a', attrs={'class': 'link film-snippet__media-content'}).get('href')
         sql = """insert into kinopoisk (name, altname, image, kinorating, userrating, info, link)
@@ -83,6 +92,5 @@ while next:
         c.execute(sql)
         next = True
     conn.commit()
-    print initial
 
 c.execute("select count(id) from kinopoisk;")
